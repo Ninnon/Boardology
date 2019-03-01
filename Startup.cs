@@ -34,11 +34,17 @@ namespace Boardology.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            .AddJsonOptions(opt =>
+             {
+                 opt.SerializerSettings.ReferenceLoopHandling =
+                 Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+             });
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddCors();
             services.AddTransient<Seed>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IBoardologyRepository, BoardologyRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -78,7 +84,7 @@ namespace Boardology.API
             }
 
             //app.UseHttpsRedirection();
-            seeder.SeedGames();
+            //seeder.SeedGames();
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseMvc();
