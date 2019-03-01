@@ -112,5 +112,52 @@ namespace Boardology.API.Controllers
 
             return BadRequest("Failed to downvote game");
         }
+
+        [Authorize]
+        [HttpPost("{id}/comment/{gameId}")]
+        public async Task<IActionResult> AddComment(int id, int gameId, Comment comment)
+        {
+            if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            {
+                return Unauthorized();
+            }
+
+            if (await _repo.GetGame(gameId) == null)
+            {
+                return NotFound();
+            }
+
+            comment = new Comment
+            {
+                UserId = id,
+                GameId = gameId,
+                Content = comment.Content
+            };
+
+            _repo.Add(comment);
+
+            if (await _repo.SaveAll())
+            {
+                return Ok();
+            }
+
+            return BadRequest("Failed to add comment");
+
+        }
+
+        [HttpGet("{gameId}/comments")]
+        public async Task<IActionResult> AddComment(int gameId)
+        {
+          
+            if (await _repo.GetGame(gameId) == null)
+            {
+                return NotFound();
+            }
+
+            var comments = await _repo.GetComments(gameId);
+
+            return Ok(comments);
+
+        }
     }
 }

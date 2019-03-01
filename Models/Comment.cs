@@ -11,5 +11,12 @@ namespace Boardology.API.Models
         public int GameId { get; set; }
         public string Content { get; set; }
         public DateTime Created { get; set; }
+        public int UserId { get; set; }
+
+        public Comment()
+        {
+            Created = DateTime.Now;
+        }
+
     }
 }
