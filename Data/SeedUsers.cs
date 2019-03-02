@@ -7,22 +7,22 @@ using Newtonsoft.Json;
 
 namespace Boardology.API.Data
 {
-    public class Seed
+    public class SeedUsers
     {
         private readonly DataContext _context;
 
-        public Seed(DataContext context)
+        public SeedUsers(DataContext context)
         {
             _context = context;
         }
 
-        public void SeedGames()
+        public void SeedBoardologyUsers()
         {
-            var gameData = System.IO.File.ReadAllText("Data/GameSeedData.json");
-            var games = JsonConvert.DeserializeObject<List<Game>>(gameData);
-            foreach (var game in games)
+            var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
+            var users = JsonConvert.DeserializeObject<List<User>>(userData);
+            foreach (var user in users)
             {
-                _context.Games.Add((game));
+                _context.Users.Add(user);
             }
 
             _context.SaveChanges();

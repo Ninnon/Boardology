@@ -42,7 +42,8 @@ namespace Boardology.API
              });
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddCors();
-            services.AddTransient<Seed>();
+            services.AddTransient<SeedGames>();
+            services.AddTransient<SeedUsers>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IBoardologyRepository, BoardologyRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -59,7 +60,7 @@ namespace Boardology.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Seed seeder)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, SeedGames seedGames, SeedUsers seedUsers)
         {
             if (env.IsDevelopment())
             {
@@ -84,7 +85,8 @@ namespace Boardology.API
             }
 
             //app.UseHttpsRedirection();
-            //seeder.SeedGames();
+            //seedGames.SeedBoardGames();
+            //seedUsers.SeedBoardologyUsers();
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseMvc();

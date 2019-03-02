@@ -12,11 +12,12 @@ namespace Boardology.API.Data
         void Delete<T>(T entity) where T : class;
         Task<bool> SaveAll();
         Task<IEnumerable<Game>> GetGames();
-        Task<Game> GetGame(int id);
+        Task<Game> GetGame(int gameId);
         Task<Upvote> GetUpvote(int userId, int gameId);
         Task<Downvote> GetDownvote(int userId, int gameId);
         Task<Game> IncreaseUpvotes(int gameId);
         Task<Game> IncreaseDownvotes(int gameId);
         Task<List<Comment>> GetComments(int gameId);
+        Task<Comment> GetComment(int commentId);
     }
 }

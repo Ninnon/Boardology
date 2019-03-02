@@ -29,22 +29,104 @@ namespace Boardology.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetGame(int id)
+        public async Task<IActionResult> GetGame(int gameId)
         {
-            var game = await _repo.GetGame(id);
+            var game = await _repo.GetGame(gameId);
 
             return Ok(game);
         }
 
-        [Authorize]
-        [HttpPost("{id}/upvote/{gameId}")]
-        public async Task<IActionResult> UpvoteGame(int id, int gameId)
+       
+        [HttpGet("{gameId}/comments")]
+        public async Task<IActionResult> GetComments(int gameId)
         {
-            if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+
+            if (await _repo.GetGame(gameId) == null)
+            {
+                return NotFound();
+            }
+
+            var comments = await _repo.GetComments(gameId);
+
+            return Ok(comments);
+
+        }
+
+        [Authorize]
+        [HttpPost("{userId}/comment/{gameId}")]
+        public async Task<IActionResult> AddComment(int userId, int gameId, Comment comment)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
             {
                 return Unauthorized();
             }
-            var upvote = await _repo.GetUpvote(id, gameId);
+
+            if (await _repo.GetGame(gameId) == null)
+            {
+                return NotFound();
+            }
+
+            comment = new Comment
+            {
+                UserId = userId,
+                GameId = gameId,
+                Content = comment.Content
+            };
+
+            _repo.Add(comment);
+
+            if (await _repo.SaveAll())
+            {
+                return Ok();
+            }
+
+            return BadRequest("Failed to add comment");
+
+        }
+
+
+        [Authorize]
+        [HttpDelete("{userId}/comment/{commentId}")]
+        public async Task<IActionResult> DeleteComment(int userId, int commentId)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            {
+                return Unauthorized();
+            }
+
+            var comment = await _repo.GetComment(commentId);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            if (comment.UserId != userId)
+            {
+                return Unauthorized();
+            }
+
+            _repo.Delete(comment);
+
+            
+            if (await _repo.SaveAll())
+            {
+                return Ok();
+            }
+
+            return BadRequest("Failed to delete comment");
+
+        }
+
+        [Authorize]
+        [HttpPost("{userId}/upvote/{gameId}")]
+        public async Task<IActionResult> UpvoteGame(int userId, int gameId)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            {
+                return Unauthorized();
+            }
+            var upvote = await _repo.GetUpvote(userId, gameId);
 
             if (upvote != null)
             {
@@ -58,7 +140,7 @@ namespace Boardology.API.Controllers
 
             upvote = new Upvote
             {
-                UpVoterId = id,
+                UpVoterId = userId,
                 GameId = gameId
             };
 
@@ -76,14 +158,14 @@ namespace Boardology.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("{id}/downvote/{gameId}")]
-        public async Task<IActionResult> DownvoteGame(int id, int gameId)
+        [HttpPost("{userId}/downvote/{gameId}")]
+        public async Task<IActionResult> DownvoteGame(int userId, int gameId)
         {
-            if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
             {
                 return Unauthorized();
             }
-            var downvote = await _repo.GetDownvote(id, gameId);
+            var downvote = await _repo.GetDownvote(userId, gameId);
 
             if (downvote != null)
             {
@@ -97,7 +179,7 @@ namespace Boardology.API.Controllers
 
             downvote = new Downvote
             {
-                DownVoterId = id,
+                DownVoterId = userId,
                 GameId = gameId
             };
 
@@ -111,53 +193,6 @@ namespace Boardology.API.Controllers
             }
 
             return BadRequest("Failed to downvote game");
-        }
-
-        [Authorize]
-        [HttpPost("{id}/comment/{gameId}")]
-        public async Task<IActionResult> AddComment(int id, int gameId, Comment comment)
-        {
-            if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-            {
-                return Unauthorized();
-            }
-
-            if (await _repo.GetGame(gameId) == null)
-            {
-                return NotFound();
-            }
-
-            comment = new Comment
-            {
-                UserId = id,
-                GameId = gameId,
-                Content = comment.Content
-            };
-
-            _repo.Add(comment);
-
-            if (await _repo.SaveAll())
-            {
-                return Ok();
-            }
-
-            return BadRequest("Failed to add comment");
-
-        }
-
-        [HttpGet("{gameId}/comments")]
-        public async Task<IActionResult> AddComment(int gameId)
-        {
-          
-            if (await _repo.GetGame(gameId) == null)
-            {
-                return NotFound();
-            }
-
-            var comments = await _repo.GetComments(gameId);
-
-            return Ok(comments);
-
         }
     }
 }

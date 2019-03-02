@@ -15,9 +15,9 @@ namespace Boardology.API.Data
         {
             _context = context;
         }
-        public async Task<User> Login(string username, string password)
+        public async Task<User> Login(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
             {
