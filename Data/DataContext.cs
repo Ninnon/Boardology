@@ -23,19 +23,13 @@ namespace Boardology.API.Data
                 .HasKey(k => new { k.UpVoterId, k.GameId });
 
             builder.Entity<Upvote>()
-                .HasOne(u => u.Game)
-                .WithMany(u => u.Upvoters)
-                .HasForeignKey(u => u.UpVoterId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(u => u.Game);
 
             builder.Entity<Downvote>()
                 .HasKey(k => new { k.DownVoterId, k.GameId });
 
             builder.Entity<Downvote>()
-                .HasOne(u => u.Game)
-                .WithMany(u => u.Downvoters)
-                .HasForeignKey(u => u.DownVoterId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(u => u.Game);
         }
     }
 }

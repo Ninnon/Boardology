@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Boardology.API.Dtos;
 using Boardology.API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +50,7 @@ namespace Boardology.API.Data
             return games;
         }
 
-
+ 
         public async Task<bool> SaveAll()
         {
             return await _context.SaveChangesAsync() > 0;
@@ -80,10 +82,27 @@ namespace Boardology.API.Data
             return comment;
         }
 
-        public async Task<List<Comment>> GetComments(int gameId)
+        public async Task<IList> GetComments(int gameId)
         {
-            var comments = await _context.Comments.Where(u => u.GameId == gameId).ToListAsync();
-            return comments;
+
+            var commentList = await
+                (from comments in _context.Comments
+                 join users in _context.Users
+                 on comments.UserId equals users.Id
+                 where comments.GameId == gameId
+                 select new
+                 {
+                     comments.Id,
+                     comments.GameId,
+                     comments.Content,
+                     comments.Created,
+                     comments.UserId,
+                     users.Username
+                 }).Take(5).ToListAsync();
+                 
+
+            return commentList;
+
         }
     }
 }

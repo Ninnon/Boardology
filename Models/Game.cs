@@ -14,8 +14,5 @@ namespace Boardology.API.Models
         public int Downvotes { get; set; }
         public int YearCreated { get; set; }
         public string PhotoUrl { get; set; }
-        public ICollection<Upvote> Upvoters { get; set; }
-        public ICollection<Downvote> Downvoters { get; set; }
-
     }
 }

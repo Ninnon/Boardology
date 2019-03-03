@@ -32,15 +32,22 @@ namespace Boardology.API.Controllers
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
             userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
+            userForRegisterDto.Email = userForRegisterDto.Email.ToLower();
 
-            if (await _repo.UserExists(userForRegisterDto.Username))
+            if (await _repo.UsernameExists(userForRegisterDto.Username))
             {
                 return BadRequest("Username already exists");
             }
 
+            if (await _repo.EmailExists(userForRegisterDto.Email))
+            {
+                return BadRequest("Email already exists");
+            }
+
             var userToCreate = new User
             {
-                Username = userForRegisterDto.Username
+                Username = userForRegisterDto.Username,
+                Email = userForRegisterDto.Email
             };
 
             var createdUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
@@ -54,7 +61,7 @@ namespace Boardology.API.Controllers
             var userFromRepo = await _repo.Login(userForLoginDto.Email.ToLower(), userForLoginDto.Password);
             if (userFromRepo == null)
             {
-                return Unauthorized();
+                return Unauthorized("Something went wrong signing in. Please ensure your information is correct and attempt to sign in again.");
             }
 
             var claims = new[]

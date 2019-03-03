@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Boardology.API.Data;
 using Boardology.API.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,6 +43,7 @@ namespace Boardology.API
              });
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddCors();
+            services.AddAutoMapper();
             services.AddTransient<SeedGames>();
             services.AddTransient<SeedUsers>();
             services.AddScoped<IAuthRepository, AuthRepository>();
@@ -85,7 +87,7 @@ namespace Boardology.API
             }
 
             //app.UseHttpsRedirection();
-            //seedGames.SeedBoardGames();
+            seedGames.SeedBoardGames();
             //seedUsers.SeedBoardologyUsers();
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();

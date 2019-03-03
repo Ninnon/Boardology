@@ -15,6 +15,8 @@ namespace Boardology.API.Data
         {
             _context = context;
         }
+
+
         public async Task<User> Login(string email, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
@@ -45,9 +47,19 @@ namespace Boardology.API.Data
             return user;
         }
 
-        public async Task<bool> UserExists(string username)
+        public async Task<bool> UsernameExists(string username)
         {
             if (await _context.Users.AnyAsync(x => x.Username == username))
+            {
+                return true;
+            }
+            return false;
+        }
+
+
+        public async Task<bool> EmailExists(string email)
+        {
+            if (await _context.Users.AnyAsync(x => x.Email == email))
             {
                 return true;
             }
